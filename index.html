@@ -76,7 +76,6 @@ h2 { text-align:center; margin-bottom:20px; color:#ffae00;}
 <div class="admin-btn" onclick="location.href='admin.html'">إدارة الموقع</div>
 
 <script type="module">
-// إعداد Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 
@@ -91,29 +90,33 @@ const firebaseConfig = {
   measurementId: "G-36TCVGKQK2"
 };
 
-// تهيئة Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// عرض المطاعم من قاعدة البيانات
 function renderRestaurants(data) {
   const container = document.getElementById('restaurants-container');
   container.innerHTML = '';
 
   data.forEach(rest => {
+    if (!rest.name || !rest.images) return; // إذا البيانات ناقصة نتخطى
+
     const restDiv = document.createElement('div');
     restDiv.className = 'restaurant';
+
     const title = document.createElement('h3');
     title.textContent = rest.name;
     restDiv.appendChild(title);
 
     const gallery = document.createElement('div');
     gallery.className = 'restaurant-gallery';
-    rest.images.forEach(imgName => {
-      const img = document.createElement('img');
-      img.src = imgName; // الرابط الكامل للصورة من Firebase
-      img.alt = `${rest.name} صورة`;
-      gallery.appendChild(img);
+
+    rest.images.forEach(imgUrl => {
+      if (imgUrl && imgUrl.trim() !== "") {
+        const img = document.createElement('img');
+        img.src = imgUrl;
+        img.alt = `${rest.name} صورة`;
+        gallery.appendChild(img);
+      }
     });
 
     restDiv.appendChild(gallery);
@@ -123,7 +126,6 @@ function renderRestaurants(data) {
   attachLightbox();
 }
 
-// جلب البيانات من Firebase
 const restaurantsRef = ref(db, 'restaurants');
 onValue(restaurantsRef, (snapshot) => {
   const data = snapshot.val();
@@ -132,16 +134,15 @@ onValue(restaurantsRef, (snapshot) => {
   }
 });
 
-// عرض الصور في Lightbox
 function attachLightbox(){
-  const images = document.querySelectorAll('img');
+  const images = document.querySelectorAll('.restaurant-gallery img, .gallery img');
   let currentIndex=0, imagesList=[];
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
 
   images.forEach((img,i)=>{
     img.onclick=()=>{
-      imagesList=Array.from(document.querySelectorAll('img')).map(im=>im.src);
+      imagesList=Array.from(document.querySelectorAll('.restaurant-gallery img, .gallery img')).map(im=>im.src);
       currentIndex=i;
       showLightbox();
     }
