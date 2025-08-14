@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - إضافة مطاعم</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      direction: rtl;
+      padding: 20px;
+    }
+    h1 { text-align: center; }
+    label { display: block; margin-top: 10px; }
+    input, textarea, button {
+      width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box;
+    }
+    button {
+      background: #28a745; color: white; border: none; margin-top: 15px; cursor: pointer;
+    }
+    button:hover { background: #218838; }
+    .message {
+      text-align: center; margin-top: 15px; color: green; font-weight: bold;
+    }
+    #adminForm { display: none; }
+  </style>
+</head>
+<body>
+  <h1>تسجيل الدخول</h1>
+  <div id="loginForm">
+    <label>البريد الإلكتروني</label>
+    <input type="email" id="email" placeholder="أدخل بريدك">
+    <label>كلمة المرور</label>
+    <input type="password" id="password" placeholder="أدخل كلمة المرور">
+    <button onclick="login()">تسجيل الدخول</button>
+    <div class="message" id="loginMessage"></div>
+  </div>
+
+  <div id="adminForm">
+    <h1>إضافة مطعم جديد</h1>
+    <label>اسم المطعم</label>
+    <input type="text" id="restaurantName" placeholder="أدخل اسم المطعم">
+    <label>روابط الصور (مفصولة بفاصلة)</label>
+    <input type="text" id="restaurantImages" placeholder="ضع روابط الصور هنا">
+    <button onclick="addRestaurant()">إضافة</button>
+    <div class="message" id="message"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMAk-LMcuwQQL7PWaIRFrRDZ7Tku0MbwA",
+      authDomain: "awab-photography-77c9f.firebaseapp.com",
+      databaseURL: "https://awab-photography-77c9f-default-rtdb.firebaseio.com",
+      projectId: "awab-photography-77c9f",
+      storageBucket: "awab-photography-77c9f.firebasestorage.app",
+      messagingSenderId: "671706718039",
+      appId: "1:671706718039:web:500f8901b4284df5896812",
+      measurementId: "G-36TCVGKQK2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // تسجيل الدخول
+    function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (email === "awab.albaraa@gmail.com" && password === "35351@") {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("adminForm").style.display = "block";
+      } else {
+        document.getElementById("loginMessage").textContent = "❌ بيانات الدخول غير صحيحة";
+      }
+    }
+    window.login = login;
+
+    // إضافة مطعم
+    async function addRestaurant() {
+      const name = document.getElementById('restaurantName').value.trim();
+      let images = document.getElementById('restaurantImages').value.trim().split(',');
+
+      if (!name || images.length === 0) {
+        alert("الرجاء إدخال جميع الحقول");
+        return;
+      }
+
+      // تحويل روابط Google Drive إلى عرض مباشر
+      images = images.map(url => {
+        if (url.includes("drive.google.com")) {
+          const fileId = url.match(/[-\w]{25,}/);
+          if (fileId) {
+            return `https://drive.google.com/uc?export=view&id=${fileId[0]}`;
+          }
+        }
+        return url.trim();
+      });
+
+      const restaurantsRef = ref(db, "restaurants");
+      const snapshot = await get(restaurantsRef);
+      let restaurants = snapshot.exists() ? snapshot.val() : [];
+
+      restaurants.push({ name: name, images: images });
+      await set(restaurantsRef, restaurants);
+
+      document.getElementById('message').textContent = "✅ تم إضافة المطعم بنجاح";
+      document.getElementById('restaurantName').value = '';
+      document.getElementById('restaurantImages').value = '';
+    }
+    window.addRestaurant = addRestaurant;
+  </script>
+</body>
+</html>

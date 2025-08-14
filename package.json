@@ -1,0 +1,14 @@
+{
+  "name": "awab-photography",
+  "version": "1.0.0",
+  "description": "موقع المصور Awab photography",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000"
+  },
+  "author": "Awab",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
