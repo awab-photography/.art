@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Awab Photography</title>
 <style>
+/* ... التنسيقات الأصلية كما هي ... */
 body { font-family: 'Arial', sans-serif; margin:0; background:#000; color:#eee; direction:rtl; min-height:100vh; display:flex; flex-direction:column;}
 header { background:#000; height:100vh; display:flex; justify-content:center; align-items:center; text-align:center; flex-shrink:0;}
 header h1 { font-size:3rem; background: rgba(0,0,0,0.6); padding:20px; border-radius:10px; color:#ffae00;}
@@ -41,6 +42,7 @@ h2 { text-align:center; margin-bottom:20px; color:#ffae00;}
 <h2>تشكيلة صور</h2>
 <div class="separator"></div>
 <div class="gallery">
+  <!-- الصور الثابتة لديك تبقى كما هي -->
   <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=800&q=80" alt="صورة 1" />
   <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80" alt="صورة 2" />
   <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80" alt="صورة 3" />
@@ -86,38 +88,48 @@ const firebaseConfig = {
   projectId: "awab-photography-77c9f",
   storageBucket: "awab-photography-77c9f.appspot.com",
   messagingSenderId: "671706718039",
-  appId: "1:671706718039:web:500f8901b4284df5896812",
-  measurementId: "G-36TCVGKQK2"
+  appId: "1:671706718039:web:500f8901b4284df5896812"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+const defaultRestaurants = [
+  {
+    name: "مطعم الإفطار",
+    images: ["https://drive.google.com/uc?export=view&id=10xLzydUdcJMdI6WGQXClufuqvfVCWLQZ"]
+  },
+  {
+    name: "مطعم العشاء",
+    images: ["https://drive.google.com/uc?export=view&id=10xLzydUdcJMdI6WGQXClufuqvfVCWLQZ"]
+  }
+];
 
 function renderRestaurants(data) {
   const container = document.getElementById('restaurants-container');
   container.innerHTML = '';
 
   data.forEach(rest => {
-    if (!rest.name || !rest.images) return; // إذا البيانات ناقصة نتخطى
-
+    const restName = rest.name && rest.name.trim() !== "" ? rest.name : "مطعم بدون اسم";
     const restDiv = document.createElement('div');
     restDiv.className = 'restaurant';
-
     const title = document.createElement('h3');
-    title.textContent = rest.name;
+    title.textContent = restName;
     restDiv.appendChild(title);
 
     const gallery = document.createElement('div');
     gallery.className = 'restaurant-gallery';
 
-    rest.images.forEach(imgUrl => {
-      if (imgUrl && imgUrl.trim() !== "") {
-        const img = document.createElement('img');
-        img.src = imgUrl;
-        img.alt = `${rest.name} صورة`;
-        gallery.appendChild(img);
-      }
-    });
+    if (Array.isArray(rest.images)) {
+      rest.images.forEach(imgUrl => {
+        if (imgUrl && imgUrl.trim() !== "") {
+          const img = document.createElement('img');
+          img.src = imgUrl;
+          img.alt = `${restName} صورة`;
+          gallery.appendChild(img);
+        }
+      });
+    }
 
     restDiv.appendChild(gallery);
     container.appendChild(restDiv);
@@ -126,47 +138,46 @@ function renderRestaurants(data) {
   attachLightbox();
 }
 
-const restaurantsRef = ref(db, 'restaurants');
-onValue(restaurantsRef, (snapshot) => {
+const restaurantRef = ref(db, 'restaurants');
+onValue(restaurantRef, snapshot => {
   const data = snapshot.val();
   if (data) {
     renderRestaurants(Object.values(data));
+  } else {
+    renderRestaurants(defaultRestaurants);
   }
 });
 
 function attachLightbox(){
   const images = document.querySelectorAll('.restaurant-gallery img, .gallery img');
-  let currentIndex=0, imagesList=[];
+  let currentIndex=0; let imagesList=[];
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
 
-  images.forEach((img,i)=>{
-    img.onclick=()=>{
-      imagesList=Array.from(document.querySelectorAll('.restaurant-gallery img, .gallery img')).map(im=>im.src);
-      currentIndex=i;
+  images.forEach((img,i) => {
+    img.onclick = () => {
+      imagesList = Array.from(document.querySelectorAll('.restaurant-gallery img, .gallery img')).map(im=>im.src);
+      currentIndex = i;
       showLightbox();
     }
   });
 
   function showLightbox(){
-    lightbox.style.display='flex';
-    lightboxImg.style.opacity=0;
-    setTimeout(()=>{ lightboxImg.src=imagesList[currentIndex]; lightboxImg.onload=()=>lightboxImg.style.opacity=1; },50);
+    lightbox.style.display = 'flex';
+    lightboxImg.src = imagesList[currentIndex];
   }
 
-  function changeImage(offset){
-    lightboxImg.style.opacity=0;
-    setTimeout(()=>{
-      currentIndex=(currentIndex+offset+imagesList.length)%imagesList.length;
-      lightboxImg.src=imagesList[currentIndex];
-      lightboxImg.onload=()=>lightboxImg.style.opacity=1;
-    },300);
-  }
-
-  document.getElementById('close').onclick=()=>lightbox.style.display='none';
-  document.getElementById('prev').onclick=()=>changeImage(-1);
-  document.getElementById('next').onclick=()=>changeImage(1);
+  document.getElementById('close').onclick = () => lightbox.style.display = 'none';
+  document.getElementById('prev').onclick = () => {
+    currentIndex = (currentIndex - 1 + imagesList.length) % imagesList.length;
+    lightboxImg.src = imagesList[currentIndex];
+  };
+  document.getElementById('next').onclick = () => {
+    currentIndex = (currentIndex + 1) % imagesList.length;
+    lightboxImg.src = imagesList[currentIndex];
+  };
 }
 </script>
+
 </body>
 </html>
