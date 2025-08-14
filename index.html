@@ -29,6 +29,33 @@ h2 { text-align:center; margin-bottom:20px; color:#ffae00;}
 #next { top:50%; right:30px; transform:translateY(-50%);}
 .admin-btn { position:fixed; bottom:20px; left:20px; background:#ffae00; color:#000; padding:10px 15px; border-radius:5px; font-weight:bold; cursor:pointer; z-index:1000;}
 @media(max-width:600px){ header h1 { font-size:2rem; padding:15px; } }
+
+/* ================== الإضافات الجديدة ================== */
+/* إخفاء أزرار التنقل فقط على الهواتف */
+@media (max-width: 768px) {
+  #prev, #next {
+    display: none !important;
+  }
+}
+
+/* تأثير انتقال الصور */
+#lightbox img {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+}
+
+#lightbox img.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#lightbox img.slide-up {
+  transform: translateY(-30px);
+}
+
+#lightbox img.slide-down {
+  transform: translateY(30px);
+}
 </style>
 </head>
 <body>
@@ -42,7 +69,6 @@ h2 { text-align:center; margin-bottom:20px; color:#ffae00;}
 <h2>تشكيلة صور</h2>
 <div class="separator"></div>
 <div class="gallery">
-  <!-- الصور الثابتة لديك تبقى كما هي -->
   <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=800&q=80" alt="صورة 1" />
   <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80" alt="صورة 2" />
   <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80" alt="صورة 3" />
@@ -177,6 +203,55 @@ function attachLightbox(){
     lightboxImg.src = imagesList[currentIndex];
   };
 }
+
+/* ================== الإضافة الجديدة في JS ================== */
+(function() {
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  let touchStartY = 0;
+  let currentIndex = 0;
+  let imagesList = [];
+
+  document.querySelectorAll('.restaurant-gallery img, .gallery img').forEach((img, i) => {
+    img.addEventListener('click', () => {
+      imagesList = Array.from(document.querySelectorAll('.restaurant-gallery img, .gallery img')).map(im => im.src);
+      currentIndex = i;
+      showImage("fade");
+    });
+  });
+
+  function showImage(direction) {
+    lightboxImg.className = "";
+    lightboxImg.src = imagesList[currentIndex];
+    requestAnimationFrame(() => {
+      if (direction === "up") {
+        lightboxImg.classList.add("slide-up");
+      } else if (direction === "down") {
+        lightboxImg.classList.add("slide-down");
+      }
+      lightboxImg.classList.add("show");
+    });
+  }
+
+  lightbox.addEventListener("touchstart", e => {
+    touchStartY = e.touches[0].clientY;
+  });
+
+  lightbox.addEventListener("touchend", e => {
+    let touchEndY = e.changedTouches[0].clientY;
+    let diffY = touchEndY - touchStartY;
+
+    if (Math.abs(diffY) > 50) {
+      if (diffY < 0) { // سحب للأعلى
+        currentIndex = (currentIndex + 1) % imagesList.length;
+        showImage("up");
+      } else { // سحب للأسفل
+        currentIndex = (currentIndex - 1 + imagesList.length) % imagesList.length;
+        showImage("down");
+      }
+    }
+  });
+})();
 </script>
 
 </body>
