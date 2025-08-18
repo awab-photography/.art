@@ -1,199 +1,300 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة الإدارة</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    /* ================== Reset ================== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Cairo", sans-serif;
-    }
-
-    body {
-      background: #0d0d0d;
-      color: #fff;
-      line-height: 1.8;
-      overflow-x: hidden;
-    }
-
-    h1, h2 {
-      margin-bottom: 16px;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    /* ================== Header ================== */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 40px;
-      position: fixed;
-      width: 100%;
-      top: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(6px);
-      z-index: 1000;
-    }
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #f4b400;
-      text-shadow: 0 0 8px #f4b400, 0 0 20px #f4b400;
-    }
-    nav a {
-      margin-left: 20px;
-      font-weight: 500;
-    }
-
-    /* ================== Admin Form ================== */
-    main {
-      margin-top: 120px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      min-height: 80vh;
-      position: relative;
-      z-index: 1;
-    }
-
-    form {
-      background: rgba(0,0,0,0.6);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-    }
-
-    form input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 16px;
-      border: none;
-      border-radius: 8px;
-      outline: none;
-      font-size: 1rem;
-    }
-
-    form button {
-      background: #f4b400;
-      border: none;
-      color: #000;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-      width: 100%;
-    }
-    form button:hover {
-      background: #dba100;
-    }
-
-    /* ================== Footer ================== */
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: #111;
-      margin-top: 40px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ================== الخلفية (دوائر متحركة) ================== */
-    .background {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      overflow: hidden;
-      z-index: 0;
-    }
-    .circle {
-      position: absolute;
-      bottom: -150px;
-      background: rgba(244,180,0,0.15);
-      border-radius: 50%;
-      animation: moveUp 20s linear infinite;
-    }
-    @keyframes moveUp {
-      from { transform: translateY(0) rotate(0deg); opacity: 1; }
-      to { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>إدارة المطاعم - Awab Photography</title>
+<style>
+body { font-family: Arial, sans-serif; margin:0; background:#000; color:#eee; direction:rtl; position:relative; overflow-x:hidden; }
+/* ===== خلفية متحركة ذهبية ===== */
+.background {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  background: radial-gradient(circle at center, rgba(255,174,0,0.15) 0%, transparent 70%);
+  overflow: hidden;
+}
+.line {
+  position: absolute;
+  width: 2px; height: 120%;
+  background: linear-gradient(180deg, transparent, #ffae00, transparent);
+  opacity: 0.5;
+  animation: move 6s linear infinite;
+}
+@keyframes move {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(100%); }
+}
+/* ===== تصميم الصفحة ===== */
+header { background:#000; padding:20px; text-align:center; border-bottom:2px solid #ffae00; }
+header h1 { color:#ffae00; }
+main { max-width:900px; margin:20px auto; padding:20px; }
+button { background:#ffae00; color:#000; border:none; padding:8px 15px; margin:5px; cursor:pointer; border-radius:5px; font-weight:bold; }
+button:hover { background:#e09b00; }
+input, select { padding:8px; margin:5px 0; width:100%; border-radius:5px; border:none; }
+.restaurant-images { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px,1fr)); gap:10px; }
+.restaurant-images img { width:100%; border-radius:8px; border:2px solid #444; }
+.image-actions { text-align:center; margin-top:5px; }
+.separator { height:2px; background:#ffae00; margin:20px 0; }
+#loginForm { max-width:400px; margin:80px auto; background:#111; padding:20px; border-radius:10px; border:2px solid #ffae00; }
+#loginForm h2 { color:#ffae00; text-align:center; }
+#errorMsg { color:red; text-align:center; font-size:14px; margin-top:10px; }
+</style>
 </head>
 <body>
 
-  <!-- الخلفية -->
-  <div class="background"></div>
+<!-- الخلفية المتحركة -->
+<div class="background" id="background"></div>
 
-  <!-- الهيدر -->
-  <header>
-    <div class="logo">لوحة الإدارة</div>
-    <nav>
-      <a href="index.html">الصفحة الرئيسية</a>
-    </nav>
-  </header>
+<header>
+  <h1>لوحة إدارة المطاعم</h1>
+</header>
 
-  <!-- المحتوى -->
-  <main>
-    <h1>إضافة صورة جديدة</h1>
-    <form id="addImageForm">
-      <input type="text" id="imageName" placeholder="أدخل اسم الصورة (مثال: photo1.jpg)" required>
-      <button type="submit">إضافة</button>
-    </form>
-    <p id="statusMessage"></p>
-  </main>
+<!-- نموذج تسجيل الدخول -->
+<div id="loginForm">
+  <h2>تسجيل الدخول</h2>
+  <form autocomplete="off">
+    <input type="email" id="emailInput" placeholder="البريد الإلكتروني" autocomplete="off" />
+    <input type="password" id="passwordInput" placeholder="كلمة المرور" autocomplete="new-password" />
+    <button type="button" id="loginBtn">دخول</button>
+  </form>
+  <div id="errorMsg"></div>
+</div>
 
-  <!-- الفوتر -->
-  <footer>
-    <p>© 2025 — جميع الحقوق محفوظة</p>
-  </footer>
+<!-- قسم الإدارة -->
+<main id="adminPanel" style="display:none;">
+  <section>
+    <h2>إضافة مطعم جديد</h2>
+    <input type="text" id="newRestaurantName" placeholder="اسم المطعم" />
+    <input type="text" id="newRestaurantImages" placeholder="روابط الصور (مفصولة بفاصلة)" />
+    <input type="file" id="newRestaurantFile" multiple />
+    <button id="addRestaurantBtn">إضافة مطعم</button>
+  </section>
 
-  <script>
-    // إنشاء دوائر متحركة للخلفية
-    const bg = document.querySelector('.background');
-    for (let i = 0; i < 15; i++) {
-      const circle = document.createElement('div');
-      const size = Math.random() * 80 + 20;
-      circle.classList.add('circle');
-      circle.style.width = `${size}px`;
-      circle.style.height = `${size}px`;
-      circle.style.left = `${Math.random() * 100}%`;
-      circle.style.animationDuration = `${15 + Math.random() * 10}s`;
-      bg.appendChild(circle);
-    }
+  <div class="separator"></div>
 
-    // إرسال النموذج
-    const form = document.getElementById("addImageForm");
-    const statusMsg = document.getElementById("statusMessage");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const imageName = document.getElementById("imageName").value;
-      try {
-        const res = await fetch("api.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: imageName })
-        });
-        const data = await res.json();
-        statusMsg.textContent = data.success ? "تمت إضافة الصورة بنجاح ✅" : "حدث خطأ ❌";
-      } catch (err) {
-        statusMsg.textContent = "تعذر الاتصال بالسيرفر ❌";
-      }
-      form.reset();
+  <section>
+    <h2>قائمة المطاعم</h2>
+    <select id="restaurantSelect">
+      <option value="">-- اختر مطعم --</option>
+    </select>
+  </section>
+
+  <div id="restaurantDetails" style="display:none;">
+    <div class="separator"></div>
+    <h2>تفاصيل المطعم</h2>
+    <label>تعديل اسم المطعم:</label>
+    <input type="text" id="editNameInput" />
+    <button id="saveNameBtn">💾 حفظ الاسم</button>
+    <button id="deleteRestaurantBtn" style="background:red;color:white;">🗑 حذف المطعم</button>
+
+    <div class="separator"></div>
+    <h3>الصور</h3>
+    <div id="imagesContainer" class="restaurant-images"></div>
+
+    <div class="separator"></div>
+    <h3>إضافة صورة جديدة</h3>
+    <input type="text" id="newImageInput" placeholder="رابط أو روابط الصور" />
+    <input type="file" id="newImageFile" multiple />
+    <button id="addImageBtn">إضافة صورة</button>
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDMAk-LMcuwQQL7PWaIRFrRDZ7Tku0MbwA",
+  authDomain: "awab-photography-77c9f.firebaseapp.com",
+  databaseURL: "https://awab-photography-77c9f-default-rtdb.firebaseio.com",
+  projectId: "awab-photography-77c9f",
+  storageBucket: "awab-photography-77c9f.appspot.com",
+  messagingSenderId: "671706718039",
+  appId: "1:671706718039:web:500f8901b4284df5896812"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
+
+// البريد المسموح له بالدخول
+const allowedEmail = "awab.albaraa@gmail.com";
+
+// تسجيل الدخول
+loginBtn.onclick = () => {
+  signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
+    .catch(() => errorMsg.textContent = "البريد أو كلمة المرور غير صحيحة");
+};
+
+// التحقق من حالة تسجيل الدخول
+onAuthStateChanged(auth, user => {
+  if (user && user.email === allowedEmail) {
+    loginForm.style.display = "none";
+    adminPanel.style.display = "block";
+    loadRestaurants();
+  } else if (user && user.email !== allowedEmail) {
+    alert("⚠️ ليس لديك صلاحية دخول هذه الصفحة");
+    signOut(auth);
+    window.location.href = "index.html";
+  } else {
+    loginForm.style.display = "block";
+    adminPanel.style.display = "none";
+  }
+});
+
+let restaurantsData = {};
+let currentRestaurantKey = "";
+
+function loadRestaurants() {
+  onValue(ref(db, "restaurants"), snapshot => {
+    restaurantsData = snapshot.val() || {};
+    restaurantSelect.innerHTML = '<option value="">-- اختر مطعم --</option>';
+    Object.keys(restaurantsData).forEach(key => {
+      const opt = document.createElement("option");
+      opt.value = key;
+      opt.textContent = restaurantsData[key].name || "بدون اسم";
+      restaurantSelect.appendChild(opt);
     });
-  </script>
+    if (currentRestaurantKey && restaurantsData[currentRestaurantKey]) {
+      const rest = restaurantsData[currentRestaurantKey];
+      editNameInput.value = rest.name || "";
+      renderImages(rest.images || []);
+      restaurantDetails.style.display = "block";
+    }
+  });
+}
+
+restaurantSelect.addEventListener("change", () => {
+  currentRestaurantKey = restaurantSelect.value;
+  if (currentRestaurantKey) {
+    const rest = restaurantsData[currentRestaurantKey];
+    restaurantDetails.style.display = "block";
+    editNameInput.value = rest.name || "";
+    renderImages(rest.images || []);
+  } else {
+    restaurantDetails.style.display = "none";
+  }
+});
+
+function renderImages(images) {
+  imagesContainer.innerHTML = "";
+  images.forEach((imgUrl, index) => {
+    const div = document.createElement("div");
+    const img = document.createElement("img");
+    img.src = imgUrl;
+    const actions = document.createElement("div");
+    actions.className = "image-actions";
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "🗑 حذف";
+    delBtn.style.background = "red";
+    delBtn.style.color = "white";
+    delBtn.onclick = () => deleteImage(index);
+    actions.appendChild(delBtn);
+    div.appendChild(img);
+    div.appendChild(actions);
+    imagesContainer.appendChild(div);
+  });
+}
+
+// رفع صور إلى Firebase Storage
+async function uploadFiles(files) {
+  const urls = [];
+  for (const file of files) {
+    const fileRef = storageRef(storage, 'restaurant_images/' + Date.now() + '_' + file.name);
+    await uploadBytes(fileRef, file);
+    const url = await getDownloadURL(fileRef);
+    urls.push(url);
+  }
+  return urls;
+}
+
+// إضافة مطعم جديد
+addRestaurantBtn.onclick = async () => {
+  const name = newRestaurantName.value.trim();
+  if (!name) return alert("أدخل اسم المطعم");
+  let images = newRestaurantImages.value.trim().split(",").filter(Boolean);
+  if (newRestaurantFile.files.length > 0) {
+    const uploadedUrls = await uploadFiles(newRestaurantFile.files);
+    images = images.concat(uploadedUrls);
+  }
+  const newKey = Date.now().toString();
+  update(ref(db, `restaurants/${newKey}`), { name, images })
+    .then(() => {
+      newRestaurantName.value = "";
+      newRestaurantImages.value = "";
+      newRestaurantFile.value = "";
+      alert("✅ تم إضافة المطعم بنجاح");
+    });
+};
+
+// حفظ اسم المطعم
+saveNameBtn.onclick = () => {
+  const newName = editNameInput.value.trim();
+  if (!newName) return alert("الرجاء إدخال اسم المطعم");
+  update(ref(db, `restaurants/${currentRestaurantKey}`), { name: newName });
+};
+
+// حذف المطعم من قاعدة البيانات فقط (حذف نهائي + إزالة فورية من القائمة)
+deleteRestaurantBtn.onclick = () => {
+  if (confirm("هل أنت متأكد أنك تريد حذف هذا المطعم نهائيًا؟")) {
+    const key = currentRestaurantKey;
+    remove(ref(db, `restaurants/${key}`))
+      .then(() => {
+        // إزالة فورية من القائمة وإخفاء التفاصيل
+        const option = [...restaurantSelect.options].find(o => o.value === key);
+        if (option) option.remove();
+        restaurantSelect.value = "";
+        restaurantDetails.style.display = "none";
+        currentRestaurantKey = "";
+        alert("🗑 تم حذف المطعم نهائيًا من قاعدة البيانات ✅");
+      })
+      .catch(() => alert("❌ حدث خطأ أثناء الحذف"));
+  }
+};
+
+// إضافة صورة جديدة
+addImageBtn.onclick = async () => {
+  const rest = restaurantsData[currentRestaurantKey];
+  let updatedImages = rest.images || [];
+  if (newImageInput.value.trim()) {
+    updatedImages = updatedImages.concat(newImageInput.value.trim().split(",").filter(Boolean));
+  }
+  if (newImageFile.files.length > 0) {
+    const uploadedUrls = await uploadFiles(newImageFile.files);
+    updatedImages = updatedImages.concat(uploadedUrls);
+  }
+  update(ref(db, `restaurants/${currentRestaurantKey}`), { images: updatedImages })
+    .then(() => {
+      newImageInput.value = "";
+      newImageFile.value = "";
+      alert("✅ تم إضافة الصور بنجاح");
+    });
+};
+
+// حذف صورة من قاعدة البيانات فقط
+function deleteImage(index) {
+  const rest = restaurantsData[currentRestaurantKey];
+  const updatedImages = rest.images.filter((_, i) => i !== index);
+  update(ref(db, `restaurants/${currentRestaurantKey}`), { images: updatedImages })
+    .then(() => alert("🗑 تم حذف الصورة من قاعدة البيانات ✅"))
+    .catch(() => alert("❌ حدث خطأ أثناء الحذف"));
+}
+
+// إنشاء خطوط ذهبية عشوائية للخلفية
+const bg = document.getElementById("background");
+for (let i = 0; i < 20; i++) {
+  const line = document.createElement("div");
+  line.className = "line";
+  line.style.left = Math.random() * 100 + "vw";
+  line.style.animationDuration = (4 + Math.random() * 6) + "s";
+  bg.appendChild(line);
+}
+</script>
 
 </body>
 </html>
