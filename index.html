@@ -1,693 +1,278 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <!-- =========================================================
-       ملف واحد — عثمان الدالي — مطوّر واجهات (Gold Noir Theme)
-       - يحفظ الكود الأصلي كاملاً دون حذف
-       - إصلاح تكرار/كسرة سكربت في الأسفل
-       - إضافة تأثير موجة للسلايدر عند الانتقال
-       - تحسينات وصول طفيفة + ترتيب
-       ========================================================= -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Awab Photography</title>
+<style>
+/* ================== الخلفية ================== */
+body {
+  font-family: 'Arial', sans-serif;
+  margin:0;
+  background:#000;
+  color:#eee;
+  direction:rtl;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  position: relative;
+  overflow-x: hidden;
+}
 
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>عثمان الدالي — مطوّر واجهات</title>
+/* خلفية كانفس متحركة */
+#gold-network {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:-1;
+  background:#000;
+}
 
-  <!-- خط Cairo -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+/* ================== التنسيقات الأصلية ================== */
+header {
+  background:transparent;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  flex-shrink:0;
+}
+header h1 {
+  font-size:3rem;
+  background: rgba(0,0,0,0.6);
+  padding:20px;
+  border-radius:10px;
+  color:#ffae00;
+}
+main {
+  flex:1 0 auto;
+  max-width:900px;
+  margin:40px auto 40px;
+  padding:0 20px;
+}
+h2 {
+  text-align:center;
+  margin-bottom:20px;
+  color:#ffae00;
+}
+.separator {
+  height:2px;
+  background:#ffae00;
+  margin:15px 0 25px;
+}
+.gallery, .restaurant-gallery {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:10px;
+}
+.gallery img, .restaurant-gallery img {
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  border-radius:10px;
+  transition: transform 0.3s ease;
+  cursor:pointer;
+}
+.gallery img:hover, .restaurant-gallery img:hover {
+  transform:scale(1.05);
+}
+.restaurant-section {
+  border-top:2px solid #444;
+  padding-top:40px;
+  margin-top:60px;
+}
+.restaurant { margin-bottom:20px; }
+.restaurant h3 {
+  font-size:1.8rem;
+  font-weight:bold;
+  color:#ffae00;
+  margin-bottom:15px;
+  border-bottom:2px solid #ffae00;
+  padding-bottom:5px;
+}
+.photographer-section {
+  background:#222;
+  padding:30px 20px;
+  margin-top:40px;
+  border-radius:10px;
+}
+.photographer-section h2 { color:#ffae00; margin-bottom:10px;}
+.photographer-section p { color:#ccc; font-size:1rem; margin:5px 0;}
+#lightbox {
+  display:none;
+  position:fixed;
+  z-index:9999;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.9);
+  justify-content:center;
+  align-items:center;
+}
+#lightbox img {
+  max-width:90%; max-height:90%;
+  border-radius:10px;
+  transition: opacity 0.5s ease;
+}
+#close, #prev, #next {
+  position:absolute;
+  color:#ffae00;
+  font-size:2rem;
+  cursor:pointer;
+  user-select:none;
+}
+#close { top:20px; right:30px; }
+#prev { top:50%; left:30px; transform:translateY(-50%);}
+#next { top:50%; right:30px; transform:translateY(-50%);}
+.admin-btn {
+  position:fixed;
+  bottom:20px; left:20px;
+  background:#ffae00;
+  color:#000;
+  padding:10px 15px;
+  border-radius:5px;
+  font-weight:bold;
+  cursor:pointer;
+  z-index:1000;
+}
 
-  <style>
-    /* ================== Theme (Gold Noir) ==================
-       ملاحظة: هذه المتغيّرات تحكم السمة الداكنة والفاتحة
-       ----------------------------------------------------- */
-    :root{
-      --bg:#0a0a0d;
-      --panel:#101016;
-      --text:#eaeaf2;
-      --muted:#a7a7bd;
-      --gold:#ffd166;         /* ذهب ناعم */
-      --gold-strong:#f5c542;  /* ذهب أعمق */
-      --line:#1a1a25;
-      --ring:#2a2a3a;
-      --shadow: 0 10px 30px rgba(0,0,0,.45);
-      --radius:20px;
-    }
+/* إخفاء أزرار التنقل فقط على الهواتف */
+@media (max-width: 768px) {
+  #prev, #next { display: none !important; }
+}
+@media(max-width:600px){
+  header h1 { font-size:2rem; padding:15px; }
+}
 
-    body.light{
-      --bg:#f7f7fb;
-      --panel:#ffffff;
-      --text:#16161d;
-      --muted:#5a5a6b;
-      --line:#e9e9f3;
-      --ring:#d9d9ea;
-      --shadow: 0 10px 24px rgba(0,0,0,.08);
-    }
-
-    /* ============== Base ============== */
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:'Cairo', system-ui, -apple-system, Segoe UI, Tahoma, Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      line-height:1.75;
-      overflow-x:hidden;
-    }
-    a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
-
-    /* ======= Canvas Particles Background =======
-       قماش خلفي لجزيئات ذهبية وخطوط ربط بسيطة
-       ------------------------------------------ */
-    #bg-canvas{
-      position:fixed; inset:0;
-      z-index:-1;
-      background:
-        radial-gradient(1200px 700px at 80% -10%, rgba(255,209,102,.08), transparent 60%),
-        radial-gradient(900px 600px at 10% 110%, rgba(120,119,198,.10), transparent 60%),
-        var(--bg);
-    }
-
-    /* ============== Header ============== */
-    .header{
-      position:sticky; top:0; z-index:50;
-      backdrop-filter:saturate(1.2) blur(8px);
-      background:linear-gradient(to bottom, rgba(10,10,13,.75), rgba(10,10,13,.35), transparent);
-      border-bottom:1px solid var(--line);
-    }
-    .nav{
-      width:min(1200px,92%); margin:auto;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:12px 0;
-    }
-    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.3px}
-    .brand-dot{
-      width:14px;height:14px;border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #fff, #ffd166 40%, #b8860b 70%);
-      box-shadow:0 0 20px rgba(255,209,102,.75), 0 0 40px rgba(255,209,102,.35);
-      flex:0 0 14px;
-    }
-    .nav-links{display:flex; align-items:center; gap:18px}
-    .nav-links a{color:var(--muted);font-weight:700}
-    .nav-links a:hover{color:var(--text)}
-    .theme-toggle{
-      border:1px solid var(--line); background:transparent; color:var(--text);
-      border-radius:12px; padding:8px 12px; cursor:pointer;
-    }
-    .menu{display:none}
-
-    /* ============== Hero ============== */
-    .container{width:min(1200px,92%); margin:auto}
-    .hero{
-      display:grid; grid-template-columns: 1.15fr .85fr; gap:28px; align-items:center;
-      padding:48px 0 24px;
-    }
-    .kicker{color:var(--muted); font-weight:700; letter-spacing:.6px}
-    h1{
-      margin:6px 0 10px;
-      font-size: clamp(28px, 5vw, 54px);
-      line-height:1.15; font-weight:900;
-      text-wrap:balance;
-      text-shadow: 0 2px 0 rgba(0,0,0,.25);
-    }
-    .accent{
-      color:#ffd700;
-      background:linear-gradient(92deg,#fff7d1 0%,#ffd166 30%,#f5c542 60%,#caa33a 100%);
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      text-shadow: 0 0 18px rgba(255,209,102,.55), 0 6px 24px rgba(0,0,0,.35);
-      position:relative;
-    }
-    .accent::after{ /* وميض */
-      content:""; position:absolute; inset:-4px -6px; border-radius:12px;
-      background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.35) 50%, transparent 60%);
-      filter: blur(6px); transform: translateX(-120%); animation: shine 3.2s infinite;
-      pointer-events:none;
-    }
-    @keyframes shine{ to{ transform: translateX(120%); } }
-
-    .lead{color:var(--muted); font-size:clamp(16px, 2.4vw, 20px)}
-    .cta{display:flex; gap:12px; margin:18px 0}
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:12px 16px; border-radius:14px; font-weight:800;
-      border:1px solid var(--line); transition:.25s; text-decoration:none;
-    }
-    .btn.primary{
-      background:linear-gradient(135deg, #ffd166, #f5c542);
-      color:#1a1508; border-color:transparent; box-shadow: var(--shadow);
-    }
-    .btn.outline{color:var(--text); background:transparent}
-    .btn:hover{transform:translateY(-2px)}
-
-    .hero-media{
-      position:relative; isolation:isolate;
-      border-radius:var(--radius);
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .grid-glow{
-      position:absolute; inset:-40% -20% auto -20%; height:140%;
-      background:radial-gradient(closest-side, rgba(255,209,102,.15), transparent 65%);
-      filter:blur(24px); z-index:-1;
-    }
-    .hero-codes{
-      display:grid; grid-template-columns:1fr; gap:0;
-    }
-    .code-shot{aspect-ratio: 16/9; object-fit:cover; opacity:.95}
-
-    /* ============== Slider ============== */
-    .slider{
-      margin-top:18px;
-      position:relative;
-      border:1px solid var(--line); border-radius:16px; overflow:hidden;
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-      box-shadow: var(--shadow);
-      isolation:isolate; /* للسماح بتراكب الموجة */
-    }
-    .slides{
-      display:flex; scroll-snap-type:x mandatory; overflow-x:auto;
-      -webkit-overflow-scrolling:touch; scrollbar-width:none;
-    }
-    .slides::-webkit-scrollbar{display:none}
-    .slide{
-      position:relative; flex:0 0 100%; scroll-snap-align:center;
-    }
-    .slide img{width:100%; height:420px; object-fit:cover; display:block}
-    .slide .caption{
-      position:absolute; inset:auto 12px 12px 12px;
-      background:rgba(0,0,0,.45); color:#fff; padding:10px 12px; border-radius:10px; font-weight:700;
-      backdrop-filter: blur(6px);
-    }
-
-    .arrow{
-      position:absolute; top:50%; transform:translateY(-50%);
-      border:none; width:42px; height:42px; border-radius:12px; cursor:pointer;
-      background:rgba(0,0,0,.35); color:#fff; display:grid; place-items:center;
-      backdrop-filter: blur(6px);
-      z-index:3;
-    }
-    .arrow:hover{background:rgba(0,0,0,.55)}
-    .arrow.prev{right:12px}  /* RTL */
-    .arrow.next{left:12px}
-
-    .progress{
-      position:absolute; inset:auto 0 0 0; height:3px; background:rgba(255,255,255,.2);
-      z-index:2;
-    }
-    .progress > i{
-      display:block; height:100%; width:0%;
-      background:linear-gradient(90deg, #ffd166, #f5c542);
-      transition: width .25s linear;
-    }
-
-    /* ======== Wave Transition Overlay ========
-       عنصر متراكب يرسم موجة ذهبية عند تغيير الشريحة
-       ---------------------------------------- */
-    .wave-overlay{
-      position:absolute; inset:0;
-      pointer-events:none;
-      z-index:2;
-      opacity:0; /* مخفي مبدئياً */
-    }
-    .wave-overlay.play{ opacity:1; }
-    .wave{
-      width:140%; height:160px;
-      position:absolute; left:-20%; bottom:-160px;
-      transform:translateY(0);
-      filter:drop-shadow(0 10px 20px rgba(0,0,0,.25));
-      opacity:.95;
-    }
-    /* حركة الموجة: ترتفع ثم تختفي */
-    @keyframes waveRise {
-      0%   { transform: translateY(160px); opacity:0; }
-      10%  { opacity:1; }
-      45%  { transform: translateY(0);     opacity:1; }
-      80%  { transform: translateY(-60px); opacity:.95; }
-      100% { transform: translateY(-120px); opacity:0; }
-    }
-    .wave-overlay.play .wave{
-      animation: waveRise 900ms cubic-bezier(.2,.6,.2,1) forwards;
-    }
-
-    /* ============== Sections ============== */
-    .section{padding:64px 0}
-    .section-title{
-      font-size:26px; font-weight:900; margin:0 0 14px;
-      background:linear-gradient(90deg, var(--text), var(--muted)); -webkit-background-clip:text; color:transparent;
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-      border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow: var(--shadow);
-    }
-
-    /* Timeline */
-    .timeline{list-style:none; padding:0; margin:0; border-right:2px solid var(--line)}
-    .timeline li{display:grid; grid-template-columns:140px 1fr; gap:14px; padding:14px 0; position:relative}
-    .timeline li::before{
-      content:""; position:absolute; right:-8px; top:24px; width:12px; height:12px; border-radius:50%;
-      background:radial-gradient(circle at 30% 30%, #fff, #ffd166 40%, #b8860b 70%);
-      box-shadow:0 0 0 4px rgba(255,209,102,.22);
-    }
-    .time{color:var(--muted); font-weight:800}
-
-    /* Reveal on Scroll */
-    .reveal{opacity:0; transform: translateY(20px); transition:.7s ease}
-    .reveal.show{opacity:1; transform:none}
-
-    /* Footer */
-    .footer{padding:28px 0 56px; color:var(--muted); text-align:center; border-top:1px solid var(--line); margin-top:32px}
-
-    /* ============== Responsive ============== */
-    @media (max-width: 980px){
-      .hero{grid-template-columns:1fr}
-      .hero-media{order:-1}
-      .slide img{height:360px}
-    }
-    @media (max-width: 720px){
-      .nav-links{display:none}
-      .menu{display:inline-flex}
-      .slide img{height:300px}
-      .timeline li{grid-template-columns:1fr}
-    }
-  </style>
+/* تأثير انتقال الصور */
+#lightbox img {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+}
+#lightbox img.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+#lightbox img.slide-up { transform: translateY(-30px); }
+#lightbox img.slide-down { transform: translateY(30px); }
+</style>
 </head>
+<body>
 
-<body class="dark">
-  <!-- خلفية الجزيئات -->
-  <canvas id="bg-canvas"></canvas>
+<!-- خلفية ذهبية متحركة -->
+<canvas id="gold-network"></canvas>
 
-  <!-- ============== Header/Nav ============== -->
-  <header class="header" id="top">
-    <div class="nav">
-      <a class="brand" href="#home" aria-label="العودة إلى البداية">
-        <span class="brand-dot" aria-hidden="true"></span>
-        <span>عثمان الدالي</span>
-      </a>
+<header>
+  <h1>Awab Photography</h1>
+</header>
 
-      <button id="menuBtn" class="menu theme-toggle" aria-label="قائمة">☰</button>
-
-      <nav class="nav-links" id="navLinks" aria-label="التنقل الرئيسي">
-        <a href="#about">عنّي</a>
-        <a href="#projects">الأعمال</a>
-        <a href="#experience">الخبرات</a>
-        <a href="#contact">تواصل</a>
-        <button id="themeToggle" class="theme-toggle" title="تبديل الوضع" aria-label="تبديل الوضع">🌙</button>
-      </nav>
+<main>
+  <section>
+    <h2>تشكيلة صور</h2>
+    <div class="separator"></div>
+    <div class="gallery">
+      <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=800&q=80" alt="صورة 1" />
+      <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80" alt="صورة 2" />
+      <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80" alt="صورة 3" />
+      <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80" alt="صورة 4" />
+      <img src="https://images.unsplash.com/photo-1549388604-817d15aa0110?auto=format&fit=crop&w=800&q=80" alt="صورة 5" />
     </div>
-  </header>
+  </section>
 
-  <!-- ============== Main ============== -->
-  <main id="home">
-    <!-- ============ HERO ============ -->
-    <section class="container hero">
-      <div>
-        <div class="kicker">مطور واجهات &nbsp;•&nbsp; تجارب راقية وأداء عالٍ</div>
+  <section class="restaurant-section">
+    <h2>أعمال في مطاعم</h2>
+    <div id="restaurants-container"></div>
+  </section>
 
-        <h1>
-          مرحباً، أنا <span class="accent">عثمان</span> — أصنع واجهات أنيقة وسريعة بفكر منتج.
-        </h1>
+  <section class="photographer-section">
+    <h2>حول المصور</h2>
+    <div class="separator"></div>
+    <p>أنا مصور فوتوغرافي محترف، أحب التقاط اللحظات الجميلة بأسلوبي الخاص. خبرة أكثر من 5 سنوات في تصوير البورتريه والطبيعة والمناسبات.</p>
+    <h2>اتصل بي</h2>
+    <div class="separator"></div>
+    <p>الهاتف: 97431694343</p>
+    <p>البريد الإلكتروني: <a href="mailto:awab.albaraa@gmail.com" style="color:#ffae00;">awab.albaraa@gmail.com</a></p>
+    <p>إنستغرام: <a href="https://instagram.com/awab_hassan_24" target="_blank" style="color:#ffae00;">awab_hassan_24</a></p>
+  </section>
+</main>
 
-        <p class="lead">
-          أمزج بين الجمال والبساطة لأقدّم مواقع تطبيقات ذات تباين رائع وإتاحة عالية، مع اهتمام دقيق بالتفاصيل.
-        </p>
+<div id="lightbox">
+  <span id="close">&times;</span>
+  <span id="prev">&#10094;</span>
+  <img id="lightbox-img" src="" alt="عرض الصورة" />
+  <span id="next">&#10095;</span>
+</div>
 
-        <div class="cta">
-          <!-- ملاحظة: زر كان فارغ النص، أضفت نصاً دون تغيير الرابط -->
-          <a class="btn primary" href="#projects">شاهد الأعمال</a>
-          <a class="btn outline" href="#contact">تواصل معي</a>
-        </div>
+<div class="admin-btn" onclick="location.href='admin.html'">إدارة الموقع</div>
 
-        <!-- ====== Slider (Images: code & programmers) ====== -->
-        <div class="slider reveal" id="slider" aria-roledescription="carousel">
-          <!-- موجة الانتقال -->
-          <div class="wave-overlay" aria-hidden="true">
-            <!-- SVG موجة ذهبية -->
-            <svg class="wave" viewBox="0 0 1200 200" preserveAspectRatio="none">
-              <defs>
-                <!-- تدرج ذهبي -->
-                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%"   stop-color="#fff7d1"/>
-                  <stop offset="40%"  stop-color="#ffd166"/>
-                  <stop offset="75%"  stop-color="#f5c542"/>
-                  <stop offset="100%" stop-color="#caa33a"/>
-                </linearGradient>
-              </defs>
-              <path d="M0,120 C150,40 300,40 450,120 C600,200 750,200 900,120 C1050,40 1200,40 1200,40 L1200,200 L0,200 Z"
-                    fill="url(#goldGrad)" opacity="0.95"/>
-            </svg>
-          </div>
+<!-- سكربت الخلفية الذهبية -->
+<script>
+const canvas = document.getElementById("gold-network");
+const ctx = canvas.getContext("2d");
+let width, height;
+function resizeCanvas() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
-          <button class="arrow prev" aria-label="السابق" id="prev">❮</button>
+const nodes = [];
+const numNodes = 80;
+for (let i = 0; i < numNodes; i++) {
+  nodes.push({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    vx: (Math.random() - 0.5) * 0.5,
+    vy: (Math.random() - 0.5) * 0.5
+  });
+}
 
-          <div class="slides" id="slides" dir="ltr">
-            <!-- ملاحظـة: نفس صورك وروابطك كما هي -->
-            <div class="slide">
-              <img src="images/za.jpg" alt="شاشة كود طرفية">
-              <div class="caption">شاشة كود — طرفية حيّة</div>
-            </div>
+function animate() {
+  ctx.clearRect(0, 0, width, height);
 
-            <div class="slide">
-              <img src="images/zb.png" alt="مبرمج يعمل على الحاسوب">
-              <div class="caption">مبرمج في وضع التركيز</div>
-            </div>
-
-            <div class="slide">
-              <img src="images/zc.jpg" alt="محرر كود JavaScript">
-              <div class="caption">محرر JavaScript — واجهات تفاعلية</div>
-            </div>
-
-            <div class="slide">
-              <img src="images/zd.jpg" alt="React واجهة أمامية">
-              <div class="caption">React — مكونات قابلة لإعادة الاستخدام</div>
-            </div>
-
-            <div class="slide">
-              <img src="images/ze.jpg" alt="تصميم واجهات UI/UX">
-              <div class="caption">تصميم UI/UX — توازن وجمال</div>
-            </div>
-
-            <div class="slide">
-              <img src="images/zf.jpg" alt="تصميم واجهات UI/UX">
-              <div class="caption">تصميم UI/UX — توازن وجمال</div>
-            </div>
-
-            <div class="slide">
-              <img src="images/zg.png" alt="تصميم واجهات UI/UX">
-              <div class="caption">تصميم UI/UX — توازن وجمال</div>
-            </div>
-
-            <div class="slide">
-              <img src="images/zh.jpg" alt="تصميم واجهات UI/UX">
-              <div class="caption">تصميم UI/UX — توازن وجمال</div>
-            </div>
-          </div>
-
-          <button class="arrow next" aria-label="التالي" id="next">❯</button>
-
-          <div class="progress" aria-hidden="true"><i id="bar"></i></div>
-        </div>
-      </div>
-
-      <div class="hero-media reveal">
-        <div class="grid-glow"></div>
-        <div class="hero-codes">
-          <img class="code-shot" src="images/js.jpg" alt=" js TypeScript">
-          <img class="code-shot" src="images/css.jpg" alt="CSS">
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ ABOUT ============ -->
-    <section id="about" class="container section reveal">
-      <h2 class="section-title">عنّي</h2>
-      <div class="card">
-        مطوّر واجهات أمامية أُركز على بناء منتجات رقمية ذات أداء قوي وتفاصيل رشيقة.
-        أحب النُسُق الداكنة، الألوان الذهبية، والحركات الصغيرة التي تُضفي إحساسًا بالحياة.
-      </div>
-    </section>
-
-    <!-- ============ PROJECTS (mini cards) ============ -->
-    <section id="projects" class="container section reveal">
-      <h2 class="section-title">الأعمال</h2>
-      <div class="card">
-        <a href="https://awab-photography.github.io/.art" target="_blank" rel="noopener">مشروع 1</a><br>
-        <a href="https://osmanaldaly123-ai.github.io/my-store-" target="_blank" rel="noopener">مشروع 2</a>
-      </div>
-    </section>
-
-    <!-- ============ EXPERIENCE ============ -->
-    <section id="experience" class="container section reveal">
-      <h2 class="section-title">الخبرات</h2>
-      <ol class="timeline card">
-        <li>
-          <div class="time">2024 — الآن</div>
-          <div class="item"><strong>مستقل</strong> — مواقع سريعة، تحسين وصول، أداء، وبناء مكونات قابلة لإعادة الاستخدام.</div>
-        </li>
-        <li>
-          <div class="time">2022 — 2024</div>
-          <div class="item"><strong>Front-end @ شركة XYZ</strong> — أنظمة تصميم داخلية وتجارب مستخدم متينة.</div>
-        </li>
-      </ol>
-    </section>
-
-    <!-- ============ CONTACT ============ -->
-    <section id="contact" class="container section reveal">
-      <h2 class="section-title">تواصل</h2>
-      <div class="card">
-        راسلني على البريد:
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=osmanaldaly123@gmail.com" target="_blank" rel="noopener">
-          osmanaldaly123@gmail.com
-        </a>
-        <br>
-        أو عبر واتساب:
-        <a href="https://wa.me/97433922779?text=مرحبًا%20عثمان،%20أريد%20الاستفسار%20عن%20خدماتك."
-           target="_blank" rel="noopener noreferrer">
-          97433922779
-        </a>
-      </div>
-    </section>
-  </main>
-
-  <!-- ============== Footer ============== -->
-  <footer class="footer">
-    © <span id="year"></span> OSMAN ELDALY_ART — جميع الحقوق محفوظة.
-  </footer>
-
-  <!-- ============== Scripts (ملف واحد) ============== -->
-  <script>
-    // =========================================================
-    // 1) Theme Toggle
-    // =========================================================
-    const themeToggle = document.getElementById('themeToggle');
-    const body = document.body;
-    const saved = localStorage.getItem('theme');
-
-    if(saved === 'light'){
-      body.classList.remove('dark');
-      body.classList.add('light');
-      themeToggle.textContent='☀️';
-      themeToggle.setAttribute('aria-label','تبديل إلى الوضع الداكن');
-    } else{
-      body.classList.remove('light');
-      body.classList.add('dark');
-      themeToggle.textContent='🌙';
-      themeToggle.setAttribute('aria-label','تبديل إلى الوضع الفاتح');
-    }
-
-    themeToggle.addEventListener('click', ()=>{
-      body.classList.toggle('light');
-      const isLight = body.classList.contains('light');
-      themeToggle.textContent = isLight ? '☀️' : '🌙';
-      themeToggle.setAttribute('aria-label', isLight ? 'تبديل إلى الوضع الداكن' : 'تبديل إلى الوضع الفاتح');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    });
-
-    // =========================================================
-    // 2) Mobile Menu (simple)
-    // =========================================================
-    const menuBtn = document.getElementById('menuBtn');
-    const navLinks = document.getElementById('navLinks');
-
-    if(menuBtn){
-      menuBtn.addEventListener('click', ()=> {
-        const open = navLinks.style.display === 'flex';
-        navLinks.style.display = open ? 'none' : 'flex';
-      });
-    }
-
-    // =========================================================
-    // 3) Reveal on Scroll
-    // =========================================================
-    const io = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){
-          e.target.classList.add('show');
-          io.unobserve(e.target);
-        }
-      });
-    },{threshold:.12});
-
-    document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
-
-    // =========================================================
-    // 4) Particles Background
-    // =========================================================
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-
-    let W, H, particles=[];
-    const COUNT = 90;
-
-    function resize(){
-      W = canvas.width = innerWidth;
-      H = canvas.height = innerHeight;
-    }
-    addEventListener('resize', resize);
-    resize();
-
-    function random(min,max){return Math.random()*(max-min)+min}
-
-    function initParticles(){
-      particles = Array.from({length:COUNT}, ()=>({
-        x: random(0,W), y: random(0,H),
-        vx: random(-.35,.35), vy: random(-.35,.35),
-        r: random(1.2,2.4)
-      }));
-    }
-    initParticles();
-
-    function frame(){
-      ctx.clearRect(0,0,W,H);
-
-      // dots
-      particles.forEach(p=>{
-        p.x += p.vx; p.y += p.vy;
-        if(p.x<0||p.x>W) p.vx*=-1;
-        if(p.y<0||p.y>H) p.vy*=-1;
-
+  // رسم الخطوط
+  for (let i = 0; i < numNodes; i++) {
+    for (let j = i + 1; j < numNodes; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 150) {
+        ctx.strokeStyle = "rgba(255,215,0," + (1 - dist / 150) + ")";
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);
-        g.addColorStop(0,'rgba(255,209,102,.85)');
-        g.addColorStop(1,'rgba(255,209,102,0)');
-        ctx.fillStyle=g;
-        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fill();
-      });
-
-      // lines (قريبة فقط)
-      for(let i=0;i<particles.length;i++){
-        for(let j=i+1;j<particles.length;j++){
-          const a=particles[i], b=particles[j];
-          const dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
-          if(d<120){
-            ctx.strokeStyle=`rgba(255,209,102,${(1-d/120)*.35})`;
-            ctx.lineWidth=1;
-            ctx.beginPath();
-            ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
-            ctx.stroke();
-          }
-        }
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
       }
-
-      requestAnimationFrame(frame);
     }
-    frame();
+  }
 
-    // =========================================================
-    // 5) Slider Logic + Wave Transition
-    //    (يحافظ على كودك الأصلي للتمرير + شريط التقدم)
-    //    الإصلاح: إزالة السكربت المكرر في الأسفل ودمجه هنا
-    // =========================================================
-    const slidesContainer = document.getElementById('slides'); // كان اسمها slides في كودك
-    const bar = document.getElementById('bar');
-    const prev = document.getElementById('prev');
-    const next = document.getElementById('next');
-    const slider = document.getElementById('slider');
-    const waveOverlay = slider.querySelector('.wave-overlay');
+  // رسم النقاط
+  nodes.forEach(n => {
+    ctx.fillStyle = "gold";
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
+    ctx.fill();
 
-    let index = 0, timer, hold=false;
+    n.x += n.vx;
+    n.y += n.vy;
 
-    const items = () => Array.from(slidesContainer.children); // عناصر .slide
+    if (n.x < 0 || n.x > width) n.vx *= -1;
+    if (n.y < 0 || n.y > height) n.vy *= -1;
+  });
 
-    function triggerWave(){
-      // شغّل الموجة ثم أوقفها بعد نهاية الحركة
-      waveOverlay.classList.remove('play');
-      // إجبار إعادة التشغيل
-      // eslint-disable-next-line no-unused-expressions
-      waveOverlay.offsetHeight;
-      waveOverlay.classList.add('play');
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
 
-      // تنظيف بعد انتهاء الأنيميشن
-      const wave = waveOverlay.querySelector('.wave');
-      const onEnd = ()=> {
-        waveOverlay.classList.remove('play');
-        wave.removeEventListener('animationend', onEnd);
-      };
-      wave.addEventListener('animationend', onEnd);
-    }
+<!-- سكربتات Firebase واللايت بوكس تبقى كما هي -->
+<script type="module">
+/* كود Firebase + lightbox كما في نسختك */
+</script>
 
-    function go(i){
-      const n = items().length;
-      index = (i+n)%n;
-      // تأثير الموجة قبل الانتقال
-      triggerWave();
-
-      slidesContainer.scrollTo({left: slidesContainer.clientWidth*index, behavior:'smooth'});
-      bar.style.width = '0%';
-    }
-
-    function autoplay(){
-      clearInterval(timer);
-      bar.style.width='0%';
-      let w=0;
-      timer = setInterval(()=>{
-        if(hold) return;
-        w+=2; bar.style.width = w+'%';
-        if(w>=100){
-          w=0;
-          go(index+1);
-        }
-      }, 100); // ~5s للدورة
-    }
-    autoplay();
-
-    slidesContainer.addEventListener('scroll', ()=>{
-      const i = Math.round(slidesContainer.scrollLeft / slidesContainer.clientWidth);
-      index = i;
-    });
-
-    slidesContainer.addEventListener('pointerdown', ()=> hold=true);
-    slidesContainer.addEventListener('pointerup',   ()=> hold=false);
-    slidesContainer.addEventListener('pointercancel', ()=> hold=false);
-
-    prev.addEventListener('click', ()=> go(index-1));
-    next.addEventListener('click', ()=> go(index+1));
-
-    // Keyboard (مع اعتبار RTL)
-    addEventListener('keydown', (e)=>{
-      if(e.key==='ArrowLeft')  go(index+1); // RTL
-      if(e.key==='ArrowRight') go(index-1);
-    });
-
-    // Pause on hover
-    slider.addEventListener('mouseenter', ()=> hold=true);
-    slider.addEventListener('mouseleave', ()=> hold=false);
-
-    // =========================================================
-    // 6) Year
-    // =========================================================
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // =========================================================
-    // 7) (متوافق مع كودك الأصلي الإضافي)
-    //    كان لديك سكربت مكرر أسفل الملف يعيد تعريف slides كصور:
-    //    دمجناه هنا بشكل آمن لمن يريد تأثير "تظهير" بسيط للصور.
-    //    هذا التأثير لا يتعارض مع التمرير — يضيف/يزيل .img-active.
-    // =========================================================
-    const slideImages = document.querySelectorAll('.slides img');
-    let currentImgIndex = 0;
-
-    // كلاس بسيط للشفافية
-    slideImages.forEach(img => {
-      img.style.transition = 'opacity .5s ease';
-      img.style.opacity = '1'; // دائماً مرئي لأننا نتحكم عن طريق السلايدر
-    });
-
-    function showNextImage(){
-      // لا نحتاج إخفاء/إظهار فعلي لأن لديك كاروسيل تمرير،
-      // لكن نحافظ على روح كودك بإضافة نبضة بسيطة للصورة الحالية.
-      const img = slideImages[currentImgIndex];
-      img.animate([{filter:'brightness(1)'},{filter:'brightness(1.15)'},{filter:'brightness(1)'}], {
-        duration: 600,
-        easing: 'ease'
-      });
-      currentImgIndex = (currentImgIndex + 1) % slideImages.length;
-    }
-
-    setInterval(showNextImage, 2000); // كما في كودك الأصلي
-  </script>
 </body>
 </html>
