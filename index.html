@@ -269,9 +269,50 @@ function animate() {
 animate();
 </script>
 
-<!-- سكربتات Firebase واللايت بوكس تبقى كما هي -->
+<!-- سكربت Firebase -->
 <script type="module">
-/* كود Firebase + lightbox كما في نسختك */
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  // ✅ إعدادات Firebase الصحيحة
+  const firebaseConfig = {
+    apiKey: "AIzaSyDMAk-LMcuwQQL7PWaIRFrRDZ7Tku0MbwA",
+    authDomain: "awab-photography-77c9f.firebaseapp.com",
+    databaseURL: "https://awab-photography-77c9f-default-rtdb.firebaseio.com",
+    projectId: "awab-photography-77c9f",
+    storageBucket: "awab-photography-77c9f.appspot.com",
+    messagingSenderId: "671706718039",
+    appId: "1:671706718039:web:500f8901b4284df5896812",
+    measurementId: "G-36TCVGKQK2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const restaurantsContainer = document.getElementById("restaurants-container");
+
+  // جلب البيانات من قاعدة البيانات
+  const restaurantsRef = ref(db, "restaurants");
+  onValue(restaurantsRef, (snapshot) => {
+    restaurantsContainer.innerHTML = "";
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      Object.keys(data).forEach((key) => {
+        const restaurant = data[key];
+        const div = document.createElement("div");
+        div.className = "restaurant";
+        div.innerHTML = `
+          <h3>${restaurant.name}</h3>
+          <div class="restaurant-gallery">
+            ${restaurant.images.map(img => `<img src="${img}" alt="${restaurant.name}" />`).join("")}
+          </div>
+        `;
+        restaurantsContainer.appendChild(div);
+      });
+    } else {
+      restaurantsContainer.innerHTML = "<p>لا توجد مطاعم مضافة بعد.</p>";
+    }
+  });
 </script>
 
 </body>
