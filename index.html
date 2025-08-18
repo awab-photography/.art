@@ -5,6 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Awab Photography</title>
 <style>
+/* ✅ الشريط العلوي */
+.topbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  background: rgba(17, 17, 17, 0.5); /* خلفية شفافة */
+  color: #fff; /* النص أبيض */
+  padding: 15px 30px;
+  text-align: left;   /* الاسم في اليسار */
+  font-size: 22px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);        /* تأثير مشوش */
+  -webkit-backdrop-filter: blur(10px);/* دعم سفاري */
+  z-index: 2000;
+}
+
+/* ✅ لضبط المسافة بين الشريط والمحتوى */
+body {
+  padding-top: 0px !important;
+}
+
+/* ✅ إخفاء العنوان الذهبي القديم */
+header h1 {
+  display: none !important;
+}
+
 /* ================== الخلفية ================== */
 body {
   font-family: 'Arial', sans-serif;
@@ -17,6 +45,25 @@ body {
   flex-direction:column;
   position: relative;
   overflow-x: hidden;
+  padding-top:px; /* عشان المحتوى ما يتغطى بالشريط */
+}
+
+/* ===== الشريط العلوي المشوش ===== */
+.topbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  background: rgba(17, 17, 17, 0.5); /* خلفية شفافة */
+  color: #fff; /* ✅ الكتابة باللون الأبيض */
+  padding: 15px 30px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px); /* ✅ تأثير التشويش */
+  -webkit-backdrop-filter: blur(10px); /* دعم سفاري */
+  z-index: 2000;
 }
 
 /* خلفية كانفس متحركة */
@@ -33,7 +80,7 @@ body {
 /* ================== التنسيقات الأصلية ================== */
 header {
   background:transparent;
-  height:100vh;
+  height:10vh;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -160,6 +207,11 @@ h2 {
 </style>
 </head>
 <body>
+
+<!-- ✅ الشريط العلوي المشوش -->
+<div class="topbar">
+  Awab Photography
+</div>
 
 <!-- خلفية ذهبية متحركة -->
 <canvas id="gold-network"></canvas>
