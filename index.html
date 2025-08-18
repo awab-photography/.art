@@ -92,7 +92,7 @@ header h1 {
   background: rgba(0,0,0,0.6);
   padding:20px;
   border-radius:10px;
-  color:#ffae00;
+  color:#f5f8fa;
 }
 main {
   flex:1 0 auto;
@@ -103,17 +103,24 @@ main {
 h2 {
   text-align:center;
   margin-bottom:20px;
-  color:#ffae00;
+  color:#f3f2ee;
 }
 .separator {
   height:2px;
-  background:#ffae00;
+  background:#ffff;
   margin:15px 0 25px;
 }
 .gallery, .restaurant-gallery {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
   gap:10px;
+  .gallery h2,
+.gallery h3,
+.gallery p,
+.gallery .caption {
+  color: #fff;
+}
+
 }
 .gallery img, .restaurant-gallery img {
   width:100%;
@@ -135,9 +142,9 @@ h2 {
 .restaurant h3 {
   font-size:1.8rem;
   font-weight:bold;
-  color:#ffae00;
+  color:#ffffff;           /* أسماء المطاعم أبيض */
   margin-bottom:15px;
-  border-bottom:2px solid #ffae00;
+  border-bottom:2px solid #f7f6f4;
   padding-bottom:5px;
 }
 .photographer-section {
@@ -146,7 +153,7 @@ h2 {
   margin-top:40px;
   border-radius:10px;
 }
-.photographer-section h2 { color:#ffae00; margin-bottom:10px;}
+.photographer-section h2 { color:#fdfdfd; margin-bottom:10px;}
 .photographer-section p { color:#ccc; font-size:1rem; margin:5px 0;}
 #lightbox {
   display:none;
@@ -161,7 +168,8 @@ h2 {
 #lightbox img {
   max-width:90%; max-height:90%;
   border-radius:10px;
-  transition: opacity 0.5s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease; /* انتقال */
+  opacity: 0;
 }
 #close, #prev, #next {
   position:absolute;
@@ -173,6 +181,12 @@ h2 {
 #close { top:20px; right:30px; }
 #prev { top:50%; left:30px; transform:translateY(-50%);}
 #next { top:50%; right:30px; transform:translateY(-50%);}
+
+/* ✅ حالات الانزلاق (عمودي) */
+#lightbox img.show { opacity: 1; transform: translateY(0); }
+#lightbox img.slide-up { transform: translateY(-30px); }
+#lightbox img.slide-down { transform: translateY(30px); }
+
 .admin-btn {
   position:fixed;
   bottom:20px; left:20px;
@@ -193,17 +207,8 @@ h2 {
   header h1 { font-size:2rem; padding:15px; }
 }
 
-/* تأثير انتقال الصور */
-#lightbox img {
-  transition: transform 0.4s ease, opacity 0.4s ease;
-  opacity: 0;
-}
-#lightbox img.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-#lightbox img.slide-up { transform: translateY(-30px); }
-#lightbox img.slide-down { transform: translateY(30px); }
+/* ✅ تثبيت محاذاة الاسم لليسار حتى مع تكرار تعريف .topbar */
+.topbar { text-align: left !important; }
 </style>
 </head>
 <body>
@@ -250,6 +255,7 @@ h2 {
   </section>
 </main>
 
+<!-- ✅ لايت بوكس -->
 <div id="lightbox">
   <span id="close">&times;</span>
   <span id="prev">&#10094;</span>
@@ -332,7 +338,7 @@ animate();
     authDomain: "awab-photography-77c9f.firebaseapp.com",
     databaseURL: "https://awab-photography-77c9f-default-rtdb.firebaseio.com",
     projectId: "awab-photography-77c9f",
-    storageBucket: "awab-photography-77c9f.appspot.com",
+    storageBucket: "abawab-photography-77c9f.appspot.com",
     messagingSenderId: "671706718039",
     appId: "1:671706718039:web:500f8901b4284df5896812",
     measurementId: "G-36TCVGKQK2"
@@ -363,6 +369,80 @@ animate();
       });
     } else {
       restaurantsContainer.innerHTML = "<p>لا توجد مطاعم مضافة بعد.</p>";
+    }
+  });
+</script>
+
+<!-- ✅ سكربت اللايت بوكس + الانزلاق -->
+<script>
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const closeBtn = document.getElementById('close');
+
+  let allImages = [];
+  let currentIndex = 0;
+
+  function refreshImages() {
+    allImages = Array.from(document.querySelectorAll('.gallery img, .restaurant-gallery img'));
+  }
+
+  function openLightboxAt(index) {
+    refreshImages();
+    currentIndex = index;
+    lightbox.style.display = 'flex';
+    lightboxImg.classList.remove('show','slide-up','slide-down');
+    lightboxImg.src = allImages[currentIndex].src;
+    requestAnimationFrame(() => lightboxImg.classList.add('show'));
+  }
+
+  function changeImage(step) {
+    if (!allImages.length) refreshImages();
+    const directionClass = step > 0 ? 'slide-up' : 'slide-down';
+
+    // حركة للخارج
+    lightboxImg.classList.remove('show','slide-up','slide-down');
+    lightboxImg.classList.add(directionClass);
+
+    setTimeout(() => {
+      currentIndex = (currentIndex + step + allImages.length) % allImages.length;
+      lightboxImg.src = allImages[currentIndex].src;
+      // عند تحميل الصورة الجديدة
+      lightboxImg.onload = () => {
+        lightboxImg.classList.remove('slide-up','slide-down');
+        lightboxImg.classList.add('show');
+      };
+    }, 120);
+  }
+
+  function closeLightbox() {
+    lightbox.style.display = 'none';
+    lightboxImg.classList.remove('show','slide-up','slide-down');
+  }
+
+  // فتح عند الضغط على أي صورة (حتى صور المطاعم المحمّلة ديناميكياً)
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('.gallery img, .restaurant-gallery img')) {
+      refreshImages();
+      const index = allImages.indexOf(e.target);
+      openLightboxAt(Math.max(0, index));
+    }
+    // إغلاق عند الضغط على الخلفية الداكنة
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  // الأزرار
+  nextBtn.addEventListener('click', () => changeImage(1));
+  prevBtn.addEventListener('click', () => changeImage(-1));
+  closeBtn.addEventListener('click', closeLightbox);
+
+  // لوحة المفاتيح
+  window.addEventListener('keydown', (e) => {
+    if (lightbox.style.display === 'flex') {
+      if (e.key === 'ArrowRight') changeImage(1);
+      if (e.key === 'ArrowLeft') changeImage(-1);
+      if (e.key === 'Escape') closeLightbox();
     }
   });
 </script>
