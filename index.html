@@ -209,6 +209,86 @@ h2 {
 
 /* ✅ تثبيت محاذاة الاسم لليسار حتى مع تكرار تعريف .topbar */
 .topbar { text-align: left !important; }
+
+/* ===================== [إضافات جديدة] زر القائمة + القائمة + إخفاء زر الادمن ===================== */
+
+/* إخفاء زر إدارة الموقع السفلي بدون حذفه */
+.admin-btn { display: none !important; }
+
+/* حاوية زر القائمة في الشريط العلوي */
+.menu-wrapper {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+}
+
+/* زر الهامبرغر (3 خطوط) */
+.hamburger {
+  width: 34px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+}
+.hamburger:focus { outline: none; }
+.hamburger .line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #ffae00;
+  border-radius: 3px;
+  transition: transform 0.25s ease, top 0.25s ease, opacity 0.25s ease;
+}
+.hamburger .line:nth-child(1) { top: 3px; }
+.hamburger .line:nth-child(2) { top: 11px; }
+.hamburger .line:nth-child(3) { top: 19px; }
+
+/* حالة تفعيل (تحول إلى X) */
+.hamburger.active .line:nth-child(1) { top: 11px; transform: rotate(45deg); }
+.hamburger.active .line:nth-child(2) { opacity: 0; }
+.hamburger.active .line:nth-child(3) { top: 11px; transform: rotate(-45deg); }
+
+/* القائمة المنسدلة */
+.dropdown {
+  position: fixed;             /* لتثبيتها أسفل الشريط مباشرة */
+  top: 60px;
+  right: 20px;
+  background: rgba(17, 17, 17, 0.95);
+  border-radius: 12px;
+  min-width: 200px;
+  display: none;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  z-index: 3000;
+}
+.dropdown.active { display: block; animation: fadeIn 0.2s ease; }
+.dropdown a, .dropdown button {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  color: #fff;
+  border: none;
+  text-align: right;
+  cursor: pointer;
+  font-size: 15px;
+}
+.dropdown a:hover, .dropdown button:hover {
+  background: #444;
+}
+.dropdown .divider {
+  height: 1px;
+  background: #333;
+  margin: 4px 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
 <body>
@@ -216,6 +296,22 @@ h2 {
 <!-- ✅ الشريط العلوي المشوش -->
 <div class="topbar">
   Awab Photography
+
+  <!-- زر القائمة (أُضيف بدون حذف النص الأصلي) -->
+  <div class="menu-wrapper">
+    <button class="hamburger" id="menuToggle" aria-label="Open Menu" aria-expanded="false">
+      <span class="line"></span>
+      <span class="line"></span>
+      <span class="line"></span>
+    </button>
+  </div>
+</div>
+
+<!-- القائمة المنسدلة (أضيفت) -->
+<div class="dropdown" id="dropdownMenu" dir="rtl">
+  <a href="admin.html" id="menuAdmin">إدارة الموقع</a>
+  <div class="divider"></div>
+  <button id="toggleLangBtn" type="button">English</button>
 </div>
 
 <!-- خلفية ذهبية متحركة -->
@@ -227,7 +323,7 @@ h2 {
 
 <main>
   <section>
-    <h2>تشكيلة صور</h2>
+    <h2 id="galleryTitle">تشكيلة صور</h2>
     <div class="separator"></div>
     <div class="gallery">
       <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=800&q=80" alt="صورة 1" />
@@ -239,19 +335,19 @@ h2 {
   </section>
 
   <section class="restaurant-section">
-    <h2>أعمال في مطاعم</h2>
+    <h2 id="restaurantTitle">أعمال في مطاعم</h2>
     <div id="restaurants-container"></div>
   </section>
 
   <section class="photographer-section">
-    <h2>حول المصور</h2>
+    <h2 id="aboutTitle">حول المصور</h2>
     <div class="separator"></div>
-    <p>أنا مصور فوتوغرافي محترف، أحب التقاط اللحظات الجميلة بأسلوبي الخاص. خبرة أكثر من 5 سنوات في تصوير البورتريه والطبيعة والمناسبات.</p>
-    <h2>اتصل بي</h2>
+    <p id="aboutText">أنا مصور فوتوغرافي محترف، أحب التقاط اللحظات الجميلة بأسلوبي الخاص. خبرة أكثر من 5 سنوات في تصوير البورتريه والطبيعة والمناسبات.</p>
+    <h2 id="contactTitle">اتصل بي</h2>
     <div class="separator"></div>
-    <p>الهاتف: 97431694343</p>
-    <p>البريد الإلكتروني: <a href="mailto:awab.albaraa@gmail.com" style="color:#ffae00;">awab.albaraa@gmail.com</a></p>
-    <p>إنستغرام: <a href="https://instagram.com/awab_hassan_24" target="_blank" style="color:#ffae00;">awab_hassan_24</a></p>
+    <p><span id="phoneLabel">الهاتف:</span> 97431694343</p>
+    <p><span id="emailLabel">البريد الإلكتروني:</span> <a href="mailto:awab.albaraa@gmail.com" style="color:#ffae00;">awab.albaraa@gmail.com</a></p>
+    <p><span id="instagramLabel">إنستغرام:</span> <a href="https://instagram.com/awab_hassan_24" target="_blank" style="color:#ffae00;">awab_hassan_24</a></p>
   </section>
 </main>
 
@@ -445,6 +541,123 @@ animate();
       if (e.key === 'Escape') closeLightbox();
     }
   });
+</script>
+
+<!-- ===================== [إضافات جديدة] سكربت القائمة + تبديل اللغة ===================== -->
+<script>
+  // فتح/إغلاق القائمة
+  const menuToggleBtn = document.getElementById('menuToggle');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+
+  function closeMenu() {
+    dropdownMenu.classList.remove('active');
+    if (menuToggleBtn) {
+      menuToggleBtn.classList.remove('active');
+      menuToggleBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  if (menuToggleBtn) {
+    menuToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle('active');
+      menuToggleBtn.classList.toggle('active');
+      menuToggleBtn.setAttribute(
+        'aria-expanded',
+        menuToggleBtn.classList.contains('active') ? 'true' : 'false'
+      );
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!dropdownMenu.contains(e.target) && e.target !== menuToggleBtn) {
+      closeMenu();
+    }
+  });
+
+  // تبديل اللغة (عربي ⇄ English)
+  const toggleLangBtn = document.getElementById('toggleLangBtn');
+
+  const i18n = {
+    ar: {
+      dir: 'rtl', lang: 'ar',
+      title: 'Awab Photography',
+      galleryTitle: 'تشكيلة صور',
+      restaurantTitle: 'أعمال في مطاعم',
+      aboutTitle: 'حول المصور',
+      aboutText: 'أنا مصور فوتوغرافي محترف، أحب التقاط اللحظات الجميلة بأسلوبي الخاص. خبرة أكثر من 5 سنوات في تصوير البورتريه والطبيعة والمناسبات.',
+      contactTitle: 'اتصل بي',
+      phoneLabel: 'الهاتف:',
+      emailLabel: 'البريد الإلكتروني:',
+      instagramLabel: 'إنستغرام:',
+      menuAdmin: 'إدارة الموقع',
+      toggleBtn: 'English'
+    },
+    en: {
+      dir: 'ltr', lang: 'en',
+      title: 'Awab Photography',
+      galleryTitle: 'Gallery',
+      restaurantTitle: 'Restaurant Work',
+      aboutTitle: 'About the Photographer',
+      aboutText: 'I am a professional photographer who loves capturing beautiful moments with a unique style. 5+ years of experience in portrait, nature, and events photography.',
+      contactTitle: 'Contact',
+      phoneLabel: 'Phone:',
+      emailLabel: 'Email:',
+      instagramLabel: 'Instagram:',
+      menuAdmin: 'Admin Panel',
+      toggleBtn: 'العربية'
+    }
+  };
+
+  // عناصر سيتم تبديلها
+  const el = {
+    galleryTitle: document.getElementById('galleryTitle'),
+    restaurantTitle: document.getElementById('restaurantTitle'),
+    aboutTitle: document.getElementById('aboutTitle'),
+    aboutText: document.getElementById('aboutText'),
+    contactTitle: document.getElementById('contactTitle'),
+    phoneLabel: document.getElementById('phoneLabel'),
+    emailLabel: document.getElementById('emailLabel'),
+    instagramLabel: document.getElementById('instagramLabel'),
+    menuAdmin: document.getElementById('menuAdmin'),
+  };
+
+  function applyLang(lang) {
+    const t = i18n[lang] || i18n.ar;
+    document.title = t.title;
+    document.documentElement.setAttribute('dir', t.dir);
+    document.documentElement.setAttribute('lang', t.lang);
+
+    if (el.galleryTitle) el.galleryTitle.textContent = t.galleryTitle;
+    if (el.restaurantTitle) el.restaurantTitle.textContent = t.restaurantTitle;
+    if (el.aboutTitle) el.aboutTitle.textContent = t.aboutTitle;
+    if (el.aboutText) el.aboutText.textContent = t.aboutText;
+    if (el.contactTitle) el.contactTitle.textContent = t.contactTitle;
+    if (el.phoneLabel) el.phoneLabel.textContent = t.phoneLabel + ' ';
+    if (el.emailLabel) el.emailLabel.textContent = t.emailLabel + ' ';
+    if (el.instagramLabel) el.instagramLabel.textContent = t.instagramLabel + ' ';
+    if (el.menuAdmin) el.menuAdmin.textContent = t.menuAdmin;
+
+    if (toggleLangBtn) toggleLangBtn.textContent = t.toggleBtn;
+
+    // محاذاة القائمة بحسب اللغة
+    dropdownMenu.setAttribute('dir', t.dir);
+    localStorage.setItem('siteLang', lang);
+  }
+
+  // لغة البداية من localStorage أو العربية
+  const savedLang = localStorage.getItem('siteLang') || 'ar';
+  applyLang(savedLang);
+
+  if (toggleLangBtn) {
+    toggleLangBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const current = localStorage.getItem('siteLang') || 'ar';
+      const next = current === 'ar' ? 'en' : 'ar';
+      applyLang(next);
+      closeMenu();
+    });
+  }
 </script>
 
 </body>
