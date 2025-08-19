@@ -428,7 +428,7 @@ animate();
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-  // ✅ إعدادات Firebase الصحيحة
+  // ✅ إعدادات Firebase (أبقيناها كما هي)
   const firebaseConfig = {
     apiKey: "AIzaSyDMAk-LMcuwQQL7PWaIRFrRDZ7Tku0MbwA",
     authDomain: "awab-photography-77c9f.firebaseapp.com",
@@ -445,27 +445,52 @@ animate();
 
   const restaurantsContainer = document.getElementById("restaurants-container");
 
-  // جلب البيانات من قاعدة البيانات
+  // ✅ جلب البيانات من قاعدة البيانات + حمايات إضافية + لوج أخطاء
   const restaurantsRef = ref(db, "restaurants");
   onValue(restaurantsRef, (snapshot) => {
-    restaurantsContainer.innerHTML = "";
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      Object.keys(data).forEach((key) => {
-        const restaurant = data[key];
-        const div = document.createElement("div");
-        div.className = "restaurant";
-        div.innerHTML = `
-          <h3>${restaurant.name}</h3>
-          <div class="restaurant-gallery">
-            ${restaurant.images.map(img => `<img src="${img}" alt="${restaurant.name}" />`).join("")}
-          </div>
-        `;
-        restaurantsContainer.appendChild(div);
-      });
-    } else {
-      restaurantsContainer.innerHTML = "<p>لا توجد مطاعم مضافة بعد.</p>";
+    try {
+      restaurantsContainer.innerHTML = "";
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const keys = Object.keys(data);
+
+        // لو ما في مطاعم
+        if (!keys.length) {
+          restaurantsContainer.innerHTML = "<p>لا توجد مطاعم مضافة بعد.</p>";
+          return;
+        }
+
+        keys.forEach((key) => {
+          const restaurant = data[key] || {};
+          const name = (restaurant.name && String(restaurant.name).trim()) || `مطعم بدون اسم (${key})`;
+
+          // الصور: نتعامل مع كونها مصفوفة روابط — لو مش موجودة نخليها مصفوفة فاضية
+          const images = Array.isArray(restaurant.images) ? restaurant.images : [];
+          const imgsHTML = images
+            .filter(Boolean)
+            .map((img) => `<img src="${img}" alt="${name}" />`)
+            .join("");
+
+          const div = document.createElement("div");
+          div.className = "restaurant";
+          div.innerHTML = `
+            <h3>${name}</h3>
+            <div class="restaurant-gallery">
+              ${imgsHTML || '<p style="color:#bbb">لا توجد صور بعد.</p>'}
+            </div>
+          `;
+          restaurantsContainer.appendChild(div);
+        });
+      } else {
+        restaurantsContainer.innerHTML = "<p>لا توجد مطاعم مضافة بعد.</p>";
+      }
+    } catch (err) {
+      console.error("خطأ أثناء قراءة بيانات المطاعم:", err);
+      restaurantsContainer.innerHTML = "<p>حدث خطأ أثناء تحميل المطاعم. الرجاء المحاولة لاحقًا.</p>";
     }
+  }, (error) => {
+    console.error("Firebase onValue error:", error);
+    restaurantsContainer.innerHTML = "<p>تعذر الاتصال بقاعدة البيانات.</p>";
   });
 </script>
 

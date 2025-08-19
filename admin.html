@@ -107,14 +107,16 @@ import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.c
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDMAk-LMcuwQQL7PWaIRFrRDZ7Tku0MbwA",
   authDomain: "awab-photography-77c9f.firebaseapp.com",
   databaseURL: "https://awab-photography-77c9f-default-rtdb.firebaseio.com",
   projectId: "awab-photography-77c9f",
-  storageBucket: "awab-photography-77c9f.appspot.com",
+  storageBucket: "awab-photography-77c9f.firebasestorage.app",
   messagingSenderId: "671706718039",
-  appId: "1:671706718039:web:500f8901b4284df5896812"
+  appId: "1:671706718039:web:500f8901b4284df5896812",
+  measurementId: "G-36TCVGKQK2"
 };
 
 const app = initializeApp(firebaseConfig);
