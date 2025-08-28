@@ -289,6 +289,49 @@ h2 {
   from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* ==== معرض الصور 3D ==== */
+.scene {
+  width: 100%;
+  height: 400px;
+  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px 0;
+}
+
+.gallery-3d {
+  width: 300px;
+  height: 300px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spin 20s infinite linear;
+}
+
+.gallery-3d img {
+  position: absolute;
+  width: 280px;
+  height: 180px;
+  left: 10px;
+  top: 60px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(255,255,255,0.3);
+  object-fit: cover;
+}
+
+/* توزيع الصور على دائرة */
+.gallery-3d img:nth-child(1) { transform: rotateY(0deg) translateZ(400px); }
+.gallery-3d img:nth-child(2) { transform: rotateY(60deg) translateZ(400px); }
+.gallery-3d img:nth-child(3) { transform: rotateY(120deg) translateZ(400px); }
+.gallery-3d img:nth-child(4) { transform: rotateY(180deg) translateZ(400px); }
+.gallery-3d img:nth-child(5) { transform: rotateY(240deg) translateZ(400px); }
+.gallery-3d img:nth-child(6) { transform: rotateY(300deg) translateZ(400px); }
+
+@keyframes spin {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+
 </style>
 </head>
 <body>
@@ -322,17 +365,23 @@ h2 {
 </header>
 
 <main>
-  <section>
-    <h2 id="galleryTitle">تشكيلة صور</h2>
-    <div class="separator"></div>
-    <div class="gallery">
-      <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=800&q=80" alt="صورة 1" />
-      <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80" alt="صورة 2" />
-      <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80" alt="صورة 3" />
-      <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80" alt="صورة 4" />
-      <img src="https://images.unsplash.com/photo-1549388604-817d15aa0110?auto=format&fit=crop&w=800&q=80" alt="صورة 5" />
+<section>
+  <h2 id="galleryTitle">تشكيلة صور</h2>
+  <div class="separator"></div>
+
+  <!-- ✅ معرض الصور 3D -->
+  <div class="scene">
+    <div class="gallery-3d">
+      <img src="https://i.postimg.cc/ZKq0Qn8B/50.jpg" alt="صورة 1" />
+      <img src="https://i.postimg.cc/CKphwxq4/DSC06828.jpg" alt="صورة 2" />
+      <img src="https://i.postimg.cc/TPnPbD6S/DSC-0025.jpg" alt="صورة 3" />
+      <img src="https://i.postimg.cc/gcsn48Zb/DSC-2248.jpg" alt="صورة 4" />
+      <img src="https://i.postimg.cc/C1FwfrJB/DSC-8066.jpg" alt="صورة 5" />
+      <img src="https://i.postimg.cc/8Cd1cgdg/Pics-Art-03-04-12-47-38.jpg" alt="صورة 6" />
     </div>
-  </section>
+  </div>
+</section>
+
 
   <section class="restaurant-section">
     <h2 id="restaurantTitle">أعمال في مطاعم</h2>
