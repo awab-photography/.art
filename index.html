@@ -290,17 +290,19 @@ h2 {
   to { opacity: 1; transform: translateY(0); }
 }
 /* ==== معرض الصور 3D ==== */
+
 .scene {
   width: 100%;
-  height: 300px; /* قللنا الارتفاع */
-  perspective: 800px; /* لتقليل تأثير العمق قليلاً على الجوال */
+  height: 350px; /* زيادة بسيطة */
+  perspective: 800px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px 0; /* تقليل المسافة بين المعارض */
-  overflow: hidden;
+  margin: 20px 0;
+  overflow: hidden; /* يمكن تغييره مؤقتًا إلى visible أثناء الاختبار */
   position: relative;
 }
+
 
 .gallery-3d {
   width: 250px; /* تصغير حجم المعرض */
@@ -313,22 +315,25 @@ h2 {
 
 .gallery-3d img {
   position: absolute;
-  width: 120px;  /* تصغير عرض الصورة */
-  height: 80px;  /* تصغير ارتفاع الصورة */
-  left: 0;       /* إعادة المحاذاة للوسط */
-  top: 0;
+  width: 120px;
+  height: 80px;
+  left: 50%;
+  top: 50%;   /* منتصف الحاوية */
+  transform: translate(-50%, -50%) rotateY(0deg) translateZ(200px); /* لاحظ إضافة translate(-50%, -50%) */
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(255,255,255,0.3);
   object-fit: cover;
 }
 
+
+
 /* توزيع الصور على الدائرة مع تقليل translateZ لتناسب الحجم الأصغر */
-.gallery-3d img:nth-child(1) { transform: rotateY(0deg) translateZ(200px); }
-.gallery-3d img:nth-child(2) { transform: rotateY(60deg) translateZ(200px); }
-.gallery-3d img:nth-child(3) { transform: rotateY(120deg) translateZ(200px); }
-.gallery-3d img:nth-child(4) { transform: rotateY(180deg) translateZ(200px); }
-.gallery-3d img:nth-child(5) { transform: rotateY(240deg) translateZ(200px); }
-.gallery-3d img:nth-child(6) { transform: rotateY(300deg) translateZ(200px); }
+.gallery-3d img:nth-child(1) { transform: translate(-50%, -50%) rotateY(0deg) translateZ(200px); }
+.gallery-3d img:nth-child(2) { transform: translate(-50%, -50%) rotateY(60deg) translateZ(200px); }
+.gallery-3d img:nth-child(3) { transform: translate(-50%, -50%) rotateY(120deg) translateZ(200px); }
+.gallery-3d img:nth-child(4) { transform: translate(-50%, -50%) rotateY(180deg) translateZ(200px); }
+.gallery-3d img:nth-child(5) { transform: translate(-50%, -50%) rotateY(240deg) translateZ(200px); }
+.gallery-3d img:nth-child(6) { transform: translate(-50%, -50%) rotateY(300deg) translateZ(200px); }
 
 @keyframes spin {
   from { transform: rotateY(0deg); }
